@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: e0167aa4fd08d6e4d9f0a294a3a98c54
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - cardObject: {fileID: 100000, guid: 54572342fa73658419315461dae1a5b1, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
