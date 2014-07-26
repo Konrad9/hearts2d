@@ -61,12 +61,14 @@ public class heartsController : MonoBehaviour {
 
 	void Start () 
 	{
+		Debug.Log ("start");
         newGame();
-		newTrick();
+		firstTrick();
 	}
 
-	void newTrick()
+	void firstTrick()
 	{
+		Debug.Log ("new trick");
 		///reset all of the per-trick variables		
 		handsPlayedInTrick = 0;
 		validCardSelected = false;
@@ -83,8 +85,23 @@ public class heartsController : MonoBehaviour {
         nextPlayersTurn(trickLeader);
 	}
 
+	void newTrick()
+	{
+		handsPlayedInTrick = 0;
+		validCardSelected = false;
+		cardToPlay = 15;
+		trickNum++;
+		if (trickNum > 11)
+		{
+			roundNum++; 
+		}
+		tempCardLocation = 0; 
+		nextPlayersTurn (trickLeader);
+	}
+	
 	void newGame()
 	{
+		Debug.Log ("new game");
 		///reset all of the per-game variables
 		playedCards = new List<GameObject>();
 		_hands = new List<Hand>();
@@ -104,6 +121,7 @@ public class heartsController : MonoBehaviour {
 
 	void initializeDeck()
 	{
+		Debug.Log ("Initialize deck");
 		int cardCounter = 0;
 		///create a new deck, comprised of 4 suits with 13 cards each
 		for (int faceValue = 1; faceValue < 14; faceValue++)
@@ -127,6 +145,7 @@ public class heartsController : MonoBehaviour {
 
 	void shuffle()
 	{
+		Debug.Log ("shuffle");
 		GameObject tempCard;
 		int rand;
 		while (shuffleSize > 1)
@@ -142,6 +161,7 @@ public class heartsController : MonoBehaviour {
 
 	void dealToHands()
 	{
+		Debug.Log ("deal to hands");
         int i = 0;
 		while (deck.Count > 0)
 		{
@@ -173,6 +193,7 @@ public class heartsController : MonoBehaviour {
 	{
         if (validCardSelected == true)
         {
+			Debug.Log ("valid card selected = true, from currentTrickPlayer " + currentTrickPlayer);
             _hands[currentTrickPlayer].removeCardFromDeck(validCard);
             playedCards[currentTrickPlayer] = validCard;
             
@@ -201,8 +222,8 @@ public class heartsController : MonoBehaviour {
 			
 			if (++handsPlayedInTrick > 3)
 			{
-                newTrick();
-                scoreRound();
+				scoreRound();
+				newTrick();
             }
             validCardSelected = false;
 
@@ -217,7 +238,7 @@ public class heartsController : MonoBehaviour {
 
     void nextPlayersTurn(int playerToGo)
     {
-        
+		Debug.Log ("next players turn is " + playerToGo);   
         if (playerToGo != 0)
         {
             switch (playerToGo)
@@ -237,13 +258,15 @@ public class heartsController : MonoBehaviour {
 
 	void scoreRound()
 	{
+		Debug.Log ("scoreRound");
 		int score = 3002;
 	}
 
 	void playCard(GameObject playedCard)
 	{
+		Debug.Log ("playCard");
 		Card cardScript = playedCard.GetComponent<Card>();
-        
+		Debug.Log ("played card is the " + cardScript.faceValue + " of " + cardScript.suit);
 		if (trickNum > 1) 
 		{
             if (handsPlayedInTrick > 0)
@@ -343,12 +366,13 @@ public class heartsController : MonoBehaviour {
 
 	public void OnTriggerEnter(Collider collider)
 	{
-		Debug.Log (collider.tag);
+		Debug.Log ("on trigger enter" + collider);
 		playCard (collider.gameObject);
 	}
 
     private void playAI1()
     {
+		Debug.Log ("playAI1");
 		int randNum;
 		GameObject localCardToPlay = new GameObject();
 		
@@ -416,6 +440,7 @@ public class heartsController : MonoBehaviour {
 	
 	private void playAI2()
 	{
+		Debug.Log ("playAI2");
 		int randNum;
 		GameObject localCardToPlay = new GameObject();
 		
@@ -483,6 +508,7 @@ public class heartsController : MonoBehaviour {
 	
 	private void playAI3()
 	{
+		Debug.Log ("playAI3");
 		int randNum;
 		GameObject localCardToPlay = new GameObject();
 		
@@ -553,6 +579,7 @@ public class heartsController : MonoBehaviour {
 	
 	private GameObject returnNonClubsNonHeartsCard(int handNum)
 	{
+		Debug.Log ("returnNonClubsNonHeartsCard" + handNum);
 		GameObject localCardToPlay = null;
 		
 		if (_hands[handNum].containsSuit(1))
@@ -568,6 +595,7 @@ public class heartsController : MonoBehaviour {
 
 	private GameObject returnNonHeartsCard(int handNum)
 	{
+		Debug.Log ("returnNonHeartsCard" + handNum);
 		GameObject localCardToPlay = null; 
 		if (_hands[handNum].containsSuit(0))
 		{						
@@ -585,6 +613,7 @@ public class heartsController : MonoBehaviour {
 	
 	private GameObject returnAnyCard(int handNum)
 	{
+		Debug.Log ("returnAnyCard" + handNum);
 		GameObject localCardToPlay = null;
 		if (_hands[handNum].containsSuit(0))
 		{						

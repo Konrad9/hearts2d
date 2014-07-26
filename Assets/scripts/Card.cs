@@ -34,12 +34,14 @@ public class Card : MonoBehaviour {
 
 	public void setDisplayPosition(Vector3 disPos)
 	{
+		Debug.Log ("setDisplayPosition " + disPos);
 		_displayPosition = disPos;
 		gameObject.transform.position = _displayPosition;
 	}
 
 	public void resetPosition()
 	{
+		Debug.Log ("reset Position");
 		gameObject.transform.position = _displayPosition;
 	}
 

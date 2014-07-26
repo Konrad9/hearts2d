@@ -24,6 +24,7 @@ public class Hand : MonoBehaviour
 	/// <returns>The of cards.</returns>
 	public int numOfCards()
 	{
+		Debug.Log ("num of cards is " + cardsInHand.Count);
 		return cardsInHand.Count;
 	}
 
@@ -31,6 +32,7 @@ public class Hand : MonoBehaviour
 	/// Adds the card to hand.
 	public void addCardToHand(GameObject card)
 	{
+		Debug.Log ("addCardToHand");
 		cardsInHand.Add(card);
 		cardCount++;
 
@@ -40,6 +42,7 @@ public class Hand : MonoBehaviour
 	/// if it doesn't exist, return false
 	public bool removeCardFromDeck(GameObject cardToRemove)
 	{
+		Debug.Log ("removeCardFromDeck");
 		///search for card and remove 
 		return true; 
 	}
@@ -48,6 +51,7 @@ public class Hand : MonoBehaviour
 	/// Need to add proper error handling here	
 	public GameObject getCardFromDeck(int ind)
 	{
+		Debug.Log ("getCardFromDeck at index " + ind + ", num of cards is " + cardsInHand.Count);
 		if (cardsInHand.Count >= ind)
 		{
 			return cardsInHand[ind];
@@ -57,6 +61,7 @@ public class Hand : MonoBehaviour
 
 	public GameObject pickACard(int suitType, int aiType)
 	{
+		Debug.Log ("pick a card of suitType " + suitType);
 		GameObject card = null;
 		GameObject highCard = null;
 		bool skipHighCard = false;
@@ -101,6 +106,7 @@ public class Hand : MonoBehaviour
 
     public GameObject returnLowestCardOfSuit(int suitType)
     {
+		Debug.Log ("returnLowestCardOfSuit");
         GameObject card = null;
 
         int startingPosition = 0; 
@@ -117,6 +123,7 @@ public class Hand : MonoBehaviour
 
     public GameObject getTwoOfClubs()
     {
+		Debug.Log ("getTwoOfClubs");
         GameObject card = null;
 
 		for (int i = 0; i < cardCount; i++)
@@ -138,17 +145,23 @@ public class Hand : MonoBehaviour
 
 	public void clearDeck()
 	{
+		Debug.Log ("clearDeck");
 		cardsInHand.Clear();
 	}
+
+	
 
 	/// <summary>
 	/// Does the hand contain a card with the suit.
 	public bool containsSuit(int suitCheck)
 	{
+		Debug.Log ("containsSuit? " + suitCheck);
 		numCards = cardsInHand.Count;
 		for (int i = 0; i < numCards; i++)
 		{
+			Debug.Log (i);
 			Card cardScript = cardsInHand[i].GetComponent<Card>();
+			Debug.Log("card in hand is " + cardScript.faceValue + " of " + cardScript.suit + " compared to suit " + suits[suitCheck]);
 			if (cardScript.suit == suits[suitCheck])
 			{
 				return true;
@@ -162,7 +175,7 @@ public class Hand : MonoBehaviour
 	/// Counts the number of cards in each suit.
 	private void countSuits(int ind)
 	{
-
+		Debug.Log ("countSuits");
 		Card cardScript = cardsInHand[ind].GetComponent<Card>();
 		switch (cardScript.suit)
 		{
@@ -197,7 +210,7 @@ public class Hand : MonoBehaviour
 	/// Checks to see if the previous card is of the same suit, and if so, checks to see if they should be switched (in ascending order)
 	private void previousCardCheck(int ind)
 	{
-
+		Debug.Log ("previousCardCheck starting at index " + ind);
 		GameObject bufferCard;
 
 		Card cardScript = cardsInHand[ind].GetComponent<Card>();
@@ -228,6 +241,8 @@ public class Hand : MonoBehaviour
 	/// </summary>
 	public void sortCards()
 	{
+		Debug.Log ("sortCards");
+		
 		numCards = cardsInHand.Count;
 		countSuits(0);
 		int numOfCardsInPreviousSuits = numOfCardsInSuits[0]; 
@@ -305,6 +320,7 @@ public class Hand : MonoBehaviour
 	/// Displays the cards on screen.
 	public void displayCardsOnScreen()
 	{
+		Debug.Log ("displayCardsOnScreen");
 		numCards = cardsInHand.Count;
 		Vector3 displayPosition;
 		float xPos = -8f; 
