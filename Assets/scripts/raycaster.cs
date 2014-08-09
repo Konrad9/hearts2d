@@ -7,8 +7,9 @@ using System.Collections.Generic;
 public class raycaster : MonoBehaviour {
 	RaycastHit raycastHit;
 	Vector3 gameObjectPos; 
-	bool activeCard; 
+	public bool activeCard; 
 	GameObject selectedCard;
+
 
 	// Use this for initialization
 	void Start () {
@@ -19,7 +20,6 @@ public class raycaster : MonoBehaviour {
 
 	void Update()
 	{
-
 		if ((activeCard == true) && Input.GetMouseButton(0)) 
 		{
 			gameObjectPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -35,13 +35,29 @@ public class raycaster : MonoBehaviour {
 			}
 		}
 
-		if (Input.GetMouseButtonUp (0)) 
+
+		/*if ((activeCard == true) && Input.GetTouch (0).phase == TouchPhase.Moved) 
 		{
-			Card cardScript = selectedCard.GetComponent<Card>();
-			cardScript.resetPosition();
-			activeCard = false;
-			selectedCard = null;
+			gameObjectPos = Camera.main.ScreenToWorldPoint (Input.GetTouch (0).position);
+			gameObjectPos.z = 0.0f;
+			raycastHit.transform.position = gameObjectPos; 
+		} else if (Input.GetTouch (0).phase == TouchPhase.Began) {
+			activeCard = true;
+			selectedCard = raycastHit.transform.gameObject; 
+		}*/
+
+
+		if (Input.GetMouseButtonUp (0) /*|| Input.GetTouch(0).phase == TouchPhase.Canceled*/) 
+		{
+			if (activeCard)
+			{
+				Card cardScript = selectedCard.GetComponent<Card>();
+				cardScript.resetPosition();
+				activeCard = false;
+				selectedCard = null;
+			}
 		}
+
 
 
 	}

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System; 
 using System.Collections;
 using System.Collections.Generic;
@@ -10,6 +10,7 @@ public class Card : MonoBehaviour {
 	public int _faceValue;
 	private Vector3 _displayPosition;
 	private string _colliderTag; 
+	public int _belongsTohand; 
 
 
 	public Card(string suit, int face_value)
@@ -31,17 +32,27 @@ public class Card : MonoBehaviour {
 		_faceValue = faceValue;
 	}
 
+	public void setOwnerHand(int belongsTohand)
+	{
+		_belongsTohand = belongsTohand;
+	}
+
+	public int getOwnerHand()
+	{
+		return _belongsTohand;
+	}
+
 
 	public void setDisplayPosition(Vector3 disPos)
 	{
-		Debug.Log ("setDisplayPosition " + disPos);
+		//Debug.Log ("setDisplayPosition " + disPos);
 		_displayPosition = disPos;
 		gameObject.transform.position = _displayPosition;
 	}
 
 	public void resetPosition()
 	{
-		Debug.Log ("reset Position");
+//		Debug.Log ("reset Position");
 		gameObject.transform.position = _displayPosition;
 	}
 

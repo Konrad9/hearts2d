@@ -58,6 +58,18 @@ public class heartsController : MonoBehaviour {
 
     private int locationOfPlayedCard; 
 
+	private List<Vector2> handLocations; 
+
+	private bool activeCard; 
+
+	public GameObject colliderObject; 
+
+	raycaster rayCaster;
+
+	private bool allowNewTrick;
+
+	public bool showGUI; 
+
 
 	void Start () 
 	{
@@ -69,16 +81,7 @@ public class heartsController : MonoBehaviour {
 	void firstTrick()
 	{
 		Debug.Log ("new trick");
-		///reset all of the per-trick variables		
-		handsPlayedInTrick = 0;
-		validCardSelected = false;
-		cardToPlay = 15;
-		trickNum++;
-        if (trickNum > 11)
-        {
-            roundNum++; 
-        }
-		tempCardLocation = 0; 
+		newTrick (); 
 		initializeDeck();
 		shuffle();
 		dealToHands();
@@ -87,6 +90,9 @@ public class heartsController : MonoBehaviour {
 
 	void newTrick()
 	{
+		activeCard = false; 
+		showGUI = false; 
+		allowNewTrick = false;
 		handsPlayedInTrick = 0;
 		validCardSelected = false;
 		cardToPlay = 15;
@@ -103,6 +109,9 @@ public class heartsController : MonoBehaviour {
 	{
 		Debug.Log ("new game");
 		///reset all of the per-game variables
+		rayCaster  = colliderObject.GetComponent<raycaster>();
+
+
 		playedCards = new List<GameObject>();
 		_hands = new List<Hand>();
 		for (int i = 0; i < 4; ++i)
@@ -161,7 +170,7 @@ public class heartsController : MonoBehaviour {
 
 	void dealToHands()
 	{
-		Debug.Log ("deal to hands");
+		//Debug.Log ("deal to hands");
         int i = 0;
 		while (deck.Count > 0)
 		{
@@ -172,14 +181,15 @@ public class heartsController : MonoBehaviour {
                 trickLeader = i;
 				currentTrickPlayer = i;
             }
-            _hands[i].addCardToHand(deck[0]);			
+            _hands[i].addCardToHand(deck[0]);		
+			cardScript.setOwnerHand(i);
 			deck.RemoveAt(0);            
             if (++i > 3)
             {
                 i = 0;
             }
 		}
-		Debug.Log ("Hi!");
+		//Debug.Log ("Hi!");
 
 		for (int x = 0; x < 4; x++)
 		{
@@ -191,55 +201,73 @@ public class heartsController : MonoBehaviour {
 
 	void Update()
 	{
+		activeCard = rayCaster.activeCard; 
+
         if (validCardSelected == true)
         {
-			Debug.Log ("valid card selected = true, from currentTrickPlayer " + currentTrickPlayer);
+
             _hands[currentTrickPlayer].removeCardFromDeck(validCard);
             playedCards[currentTrickPlayer] = validCard;
             
             Card cardScript = validCard.GetComponent<Card>();
 
+			Debug.Log ("valid card selected = true, from hand " + cardScript.getOwnerHand() + " and current trick player is " + currentTrickPlayer);
+			/*if (cardScript.getOwnerHand != currentTrickPlayer)
+			{
+				validCardSelecte
+			}*/
             switch (currentTrickPlayer)
             {
                 case 0:
-                    cardScript.setDisplayPosition(new Vector3(-4.7f, 1.726f));
+                    cardScript.setDisplayPosition(new Vector3(-4.5f, 0.0f));
                     break;
                 case 1:
-                    cardScript.setDisplayPosition(new Vector3(-1.9f, 4.0f));
+                    cardScript.setDisplayPosition(new Vector3(-1.37f, 3.6f));
                     break;
                 case 2:
-                    cardScript.setDisplayPosition(new Vector3(-3.3f, 2.3f));
+                    cardScript.setDisplayPosition(new Vector3(2.6f, 0.7f));
                     break;
                 case 3:
-                    cardScript.setDisplayPosition(new Vector3(-0.79f, 0.185f));
+                    cardScript.setDisplayPosition(new Vector3(-1.37f, -2.14f));
                     break;
             }       
-
-			if (++currentTrickPlayer > 3)
+			;
+			if ((currentTrickPlayer += 1 ) > 3)
 			{
 				currentTrickPlayer = 0;
 			}
-			
-			if (++handsPlayedInTrick > 3)
-			{
-				scoreRound();
-				newTrick();
-            }
+			Debug.Log ("current player shoulde be " + currentTrickPlayer);
+		
+			handsPlayedInTrick += 1;
             validCardSelected = false;
 
-            nextPlayersTurn(currentTrickPlayer);
+            //nextPlayersTurn(currentTrickPlayer);
         }
         else
         {
-            nextPlayersTurn(currentTrickPlayer);
+			if (handsPlayedInTrick > 3)
+			{
+				showGUI = true; 
+				if (!activeCard && allowNewTrick)
+				{					
+					giveCardsToLoser();
+					newTrick();
+					showGUI = false; 
+				}
+			}
+			else{
+            	nextPlayersTurn(currentTrickPlayer);
+			}
         }
 
 	}
 
     void nextPlayersTurn(int playerToGo)
     {
-		Debug.Log ("next players turn is " + playerToGo);   
-        if (playerToGo != 0)
+		//Debug.Log ("next players turn is " + playerToGo); 
+
+
+		if (playerToGo != 0)
         {
             switch (playerToGo)
             {
@@ -264,7 +292,7 @@ public class heartsController : MonoBehaviour {
 
 	void playCard(GameObject playedCard)
 	{
-		Debug.Log ("playCard");
+		//Debug.Log ("playCard");
 		Card cardScript = playedCard.GetComponent<Card>();
 		Debug.Log ("played card is the " + cardScript.faceValue + " of " + cardScript.suit);
 		if (trickNum > 1) 
@@ -355,18 +383,34 @@ public class heartsController : MonoBehaviour {
                 }
             }
 		}
-
+		if (cardScript.getOwnerHand() != currentTrickPlayer)
+		{
+			validCardSelected = false; 
+		}
         if (validCardSelected == true)
         {
+			Debug.Log ("Valid card confirmed");
             validCard = playedCard;
         }
 
 	}
 
+	public void OnGUI()
+	{
+		if (showGUI)
+		{
+			if (GUI.Button(new Rect(10, 10, 50, 50),"New trick?"))
+			{	
+				Debug.Log("");
+				allowNewTrick = true;
+			}
+		}
+
+	}
 
 	public void OnTriggerEnter(Collider collider)
 	{
-		Debug.Log ("on trigger enter" + collider);
+		//Debug.Log ("on trigger enter" + collider);
 		playCard (collider.gameObject);
 	}
 
@@ -530,56 +574,56 @@ public class heartsController : MonoBehaviour {
 					///play non-hearts
 				}
 			}
-            else
-            {
-                ///if AI is the trick leader and it is the first trick, must play 2 of clubs
-                localCardToPlay = _hands[3].getTwoOfClubs();
-            }
-        }
-        else
-        {
-            if (trickNum > 1)
-            {
-                if (_hands[3].containsSuit(trickSuit))
-                {
+			else
+			{
+				///if AI is the trick leader and it is the first trick, must play 2 of clubs
+				localCardToPlay = _hands[3].getTwoOfClubs();
+			}
+		}
+		else
+		{
+			if (trickNum > 1)
+			{
+				if (_hands[3].containsSuit(trickSuit))
+				{
 					localCardToPlay = _hands[3].returnLowestCardOfSuit(trickSuit);
 				}
-                else if (heartsBroken)
-                {
-                    //randNum = UnityEngine.Random.Range(0, _hands[3].numOfCards());
+				else if (heartsBroken)
+				{
+					//randNum = UnityEngine.Random.Range(0, _hands[2].numOfCards());
 					localCardToPlay = returnAnyCard(3);
 					///play whatever
-                }
-                else
-                {
+				}
+				else
+				{
 					localCardToPlay = returnNonHeartsCard(3);
 					///play non-hearts
-                }
-            }
-            else
-            {
-                if (_hands[3].containsSuit(0))
-                {
-                    ///play clubs
+				}
+			}
+			else
+			{
+				if (_hands[3].containsSuit(0))
+				{
+					///play clubs
 					localCardToPlay = _hands[3].returnLowestCardOfSuit(0);
 				}
 				else
-                {
+				{
 					localCardToPlay = returnNonClubsNonHeartsCard(3);
 					///play non-clubs, non-hearts
-                }
-            }
-        }
-
-        playCard(localCardToPlay);
-    }
+				}
+			}
+		}
+		
+		playCard(localCardToPlay);
+	}
 
 
 	
 	
 	private GameObject returnNonClubsNonHeartsCard(int handNum)
 	{
-		Debug.Log ("returnNonClubsNonHeartsCard" + handNum);
+		//Debug.Log ("returnNonClubsNonHeartsCard" + handNum);
 		GameObject localCardToPlay = null;
 		
 		if (_hands[handNum].containsSuit(1))
@@ -595,7 +639,7 @@ public class heartsController : MonoBehaviour {
 
 	private GameObject returnNonHeartsCard(int handNum)
 	{
-		Debug.Log ("returnNonHeartsCard" + handNum);
+		//Debug.Log ("returnNonHeartsCard" + handNum);
 		GameObject localCardToPlay = null; 
 		if (_hands[handNum].containsSuit(0))
 		{						
@@ -607,13 +651,13 @@ public class heartsController : MonoBehaviour {
 		{						
 			localCardToPlay = _hands[handNum].returnLowestCardOfSuit(3);
 		}		
-
+		Destroy (localCardToPlay, 10.0f);
 		return localCardToPlay;
 	}
 	
 	private GameObject returnAnyCard(int handNum)
 	{
-		Debug.Log ("returnAnyCard" + handNum);
+		//Debug.Log ("returnAnyCard" + handNum);
 		GameObject localCardToPlay = null;
 		if (_hands[handNum].containsSuit(0))
 		{						
@@ -631,8 +675,34 @@ public class heartsController : MonoBehaviour {
 
 		return localCardToPlay;
 	}
-	
-	
+
+	public int numOfCardsPlayed()
+	{
+		return playedCards.Count; 
+	}
+
+	private void giveCardsToLoser()
+	{
+		for (int i = 0; i <= 3; i++)
+		{
+			float xOffSet = 0; 
+			Vector2 newCardPosition = new Vector2(xOffSet, 50);
+
+			playedCards[i].transform.position = newCardPosition;
+			xOffSet = i * .5f;
+
+		}
+		///move the played cards to the loser's deck
+		/// 
+		///playedCards[i].transform.position = loser'sDeckPositionOnScreen
+	}
+
+	private void moveAIPlayedCard()
+	{
+		///playedCard.transform.position = onTableNewPositionForCard over time
+	}
+
+
 	
 
 
